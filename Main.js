@@ -1,4 +1,4 @@
-var game = new Phaser.Game(360, 640, Phaser.AUTO);
+var game = new Phaser.Game(720, 1280, Phaser.AUTO);
 
 window.addEventListener( "load", function() {
     

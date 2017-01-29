@@ -30,18 +30,18 @@ var Minesweeper = {
         
         
         //----------Spawn the timer----------
-        this.world.Timer = game.add.text(10, game.world.height - 125, "Time: ",  { font: "32px Arial", fill: '#ffffff' });
+        this.world.Timer = game.add.text(10, game.world.height - 150, "Time: ",  { font: "32px Arial", fill: '#ffffff' });
         this.world.Timer.startTime = game.time.time;
         
         
         
         //----------Spawn the amount of bombs text----------
-        this.world.BombsLeftInfo = game.add.text(10, game.world.height - 155, "Bombs left: ",  { font: "32px Arial", fill: '#ffffff' });
+        this.world.BombsLeftInfo = game.add.text(10, game.world.height - 185, "Bombs left: ",  { font: "32px Arial", fill: '#ffffff' });
         
         
         
         //----------Spawn the amount of bombs text----------
-        this.world.GameStateIndicator = game.add.text(10, game.world.height - 185, field.gameState,  { font: "32px Arial", fill: '#ffffff' });
+        this.world.GameStateIndicator = game.add.text(10, game.world.height - 225, field.gameState,  { font: "32px Arial", fill: '#ffffff' });
         
         
         
