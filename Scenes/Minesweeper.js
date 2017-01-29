@@ -2,8 +2,6 @@ var Minesweeper = {
     
     new: function() {
         
-        //alert("Loading the world")
-        
         game.state.add("Minesweeper", Minesweeper);
         game.state.start("Minesweeper");
     },
@@ -12,16 +10,20 @@ var Minesweeper = {
         this.load.spritesheet('MinesweeperSprites', 'img/spriteSheet.png', 32, 32, 14);
         this.load.spritesheet('ButtonsSheet', 'img/difficultySheet.png', 300, 120, 3);
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        
+        game.canvas.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
     },
     
     
     create: function() {
         
         
-        //Spawn the default field
+        //--------------Spawn the default field---------
         var rows = 10;
         var columns = 10;
-        var bombRate = 0.3;
+        var bombRate = 0.15;
         var field = new Minefield( 10, 10, columns, rows, bombRate );
         game.world.Minefield = field;
         
@@ -35,7 +37,11 @@ var Minesweeper = {
         
         //----------Spawn the amount of bombs text----------
         this.world.BombsLeftInfo = game.add.text(10, game.world.height - 155, "Bombs left: ",  { font: "32px Arial", fill: '#ffffff' });
-        this.world.BombsLeftInfo.startTime = game.time.time;
+        
+        
+        
+        //----------Spawn the amount of bombs text----------
+        this.world.GameStateIndicator = game.add.text(10, game.world.height - 185, field.gameState,  { font: "32px Arial", fill: '#ffffff' });
         
         
         
@@ -63,7 +69,7 @@ var Minesweeper = {
         NormalButton.events.onInputUp.add(function(tile, input) {
             
             alert("NORMAL MODE")
-            field.newField( 10, 10, .2 );
+            field.newField( 10, 10, .15 );
             
             game.world.Timer.startTime = game.time.time; //Reset the timer
             resetScale();
@@ -77,7 +83,7 @@ var Minesweeper = {
         HardButton.events.onInputUp.add(function(tile, input) {
             
             alert("HARD MODE")
-            field.newField( 17, 17, .3 );
+            field.newField( 17, 17, .2 );
             
             game.world.Timer.startTime = game.time.time; //Reset the timer
             resetScale();
@@ -108,11 +114,15 @@ var Minesweeper = {
     update: function() {
         
         //-----------Timer update-----------
-        if (game.world.Minefield.gameEnded == false)
+        if (game.world.Minefield.gameState == "Running")
             game.world.Timer.text = "Time: " + Math.round((game.time.time - this.world.Timer.startTime) * .001);
         
         
         //----------Bombs left update-------
         this.world.BombsLeftInfo.text = "Bombs left: " + (game.world.Minefield.bombs - game.world.Minefield.protectedTiles);
+        
+        
+        //----------GameState update---------
+        this.world.GameStateIndicator.text = "Gamestate: " + game.world.Minefield.gameState;
     },
 }
