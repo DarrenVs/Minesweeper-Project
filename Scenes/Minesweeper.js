@@ -116,10 +116,15 @@ var Minesweeper = {
         //-----------Timer update-----------
         if (game.world.Minefield.gameState == "Running")
             game.world.Timer.text = "Time: " + Math.round((game.time.time - this.world.Timer.startTime) * .001);
+        else
+            this.world.Timer.startTime = game.time.time;
         
         
         //----------Bombs left update-------
-        this.world.BombsLeftInfo.text = "Bombs left: " + (game.world.Minefield.bombs - game.world.Minefield.protectedTiles);
+        if (game.world.Minefield.gameState == "Won")
+            this.world.BombsLeftInfo.text = "Bombs: 0";
+        else
+            this.world.BombsLeftInfo.text = "Bombs: " + (game.world.Minefield.bombs - game.world.Minefield.protectedTiles);
         
         
         //----------GameState update---------

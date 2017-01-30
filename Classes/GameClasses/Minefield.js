@@ -13,7 +13,7 @@ var Minefield = function( _x, _y, _columns, _rows, bombRate, tileSurroundings, s
     this.sprites.x = _x; this.sprites.y = _y;
     this.gameState = "NewRound"; //Keeps track of when the minefield exploded
     
-    this.spriteSize = spriteSize || {x:32, y:32};
+    this.spriteSize = spriteSize || {x:32, y:32}; //The size of each tile sprite
     this.spritesheetName = spritesheetName || "MinesweeperSprites"; //Default sprite name (can be defined in the args for a different spritesheet)
     this.spritesheet = spiresheetDefinitions || { //Default list (can be defined in the args for a different spritesheet)
         mineIndicator0: 0,
@@ -46,7 +46,7 @@ var Minefield = function( _x, _y, _columns, _rows, bombRate, tileSurroundings, s
         8: "mineIndicator8", //Mine indicator 8
     };
     
-    this.surroundingTilePositions = tileSurroundings || [ //This can also be modified for different style minesweeper grids like hexagons (cool stuf)
+    this.surroundingTilePositions = tileSurroundings || [ //This can also be modified for different style minesweeper grids like a plus sign or hexagons (if we want to get complicated)
         {x: 1, y: 1},
         {x: 1, y: 0},
         {x: 1, y: -1},
@@ -59,23 +59,11 @@ var Minefield = function( _x, _y, _columns, _rows, bombRate, tileSurroundings, s
     
     this.newField( _columns, _rows, bombRate ); //Spawn a new field
     
-    
-    
-    // DEBUGGING: prints the layout of the minefield in the console for debugging/cheating purposes
-    /*for (var y = 0; y < this.grid.length; y++) {
-        
-        var log = "";
-        for (var x = 0; x < this.grid[y].length; x++) {
-            
-            log += "\t" + this.getTile( y, x ).value;
-        }
-        console.log(log);
-    };*/
 }
 
 
 
-
+// Generates a new 2D Array grid for the mines
 Minefield.prototype.newField = function( _columns, _rows, bombRate ) {
     
     this.columns = _columns || this.columns;
@@ -135,7 +123,7 @@ Minefield.prototype.newField = function( _columns, _rows, bombRate ) {
 
 
 
-
+// Sets a flag on a tile for the user to prevent future misclicks
 Minefield.prototype.toggleProtectionOnMine = function( _x, _y ) {
     
     
@@ -160,21 +148,23 @@ Minefield.prototype.toggleProtectionOnMine = function( _x, _y ) {
 
 
 
+// End the game properly
 Minefield.prototype.endGame = function( win ) {
     
     if (win) { //Winners interaction
-        console.warn("WINNER!");
         
+        
+        //Change the game state
         this.gameState = "Won";
         
         
         //Change the bomb tiles to flags
         this.exposeTiles( -1, this.spritesheet.flag ); //( tileValue, frame, protected, exposed )
         
-    }
-    else { //Loser interaction
-        console.warn("BOOM!");
+    } else { //Loser interaction
         
+        
+        //Change the game state
         this.gameState = "Lost";
         
         //Change the wrongly protected tiles to exploded tiles (also happens in the original game)
@@ -183,10 +173,13 @@ Minefield.prototype.endGame = function( win ) {
 
         //Expose all the bomb tiles
         this.exposeTiles( -1, this.spritesheet.bomb, false, false ); //( tileValue, frame, protected, exposed )
+        
     }
 }
 
 
+
+// Used for the click interaction, checks what to do with the tile you clicked on
 Minefield.prototype.checkTile = function( _x, _y ) {
     
     
@@ -258,8 +251,11 @@ Minefield.prototype.checkTile = function( _x, _y ) {
 }
 
 
+
+// Used to randomly spawn mines around the field
 Minefield.prototype.spawnMines = function( amountOfMines, blacklistedTiles ) {
     
+    // Check for problems for the future while loops (Should always have 9 empty tiles for the starting tiles)
     if (this.bombs + amountOfMines > this.amountOfTiles - 9) {
         console.warn( "Too many mines requested, cannot fill the field with '" + amountOfMines + "' amount of mines (either not enough tiles or too many bombs). Filling the whole field with '" + (this.amountOfTiles - this.bombs - 9) + "' amount of mines so it's at least winnable (if you're very lucky).")
         amountOfMines = this.amountOfTiles - this.bombs - 9;
@@ -270,35 +266,38 @@ Minefield.prototype.spawnMines = function( amountOfMines, blacklistedTiles ) {
         var foundEmptySpot = false
         var randomPos = 0
         
+        // Look for an empty tile
         while (foundEmptySpot == false) { // This should not endlessly loop due to the if statement above making sure there are enough tiles
             
             var randomNum = Math.floor( Math.random() * this.rows * this.columns );
-            var randomPos = {x: randomNum % this.columns, y: Math.floor(randomNum / this.rows)};
+            var randomPos = {x: randomNum % this.columns, y: Math.floor(randomNum / this.rows)}; //Selects a random tile in the grid
             var blacklisted = false;
             
             if (blacklistedTiles != undefined)
                 blacklistedTiles.forEach(function(pos){
                     if (randomPos.x == pos.x && randomPos.y == pos.y)
-                        blacklisted = true;
+                        blacklisted = true; //Find a new spot
                 });
             
             if (blacklisted == false && this.getTile( randomPos.x, randomPos.y ).value >= 0)
                 foundEmptySpot = true;
         }
         
+        // If a valid tile is found, set it as a bomb
         this.setTile(randomPos.x, randomPos.y, -1) // -1 == a mine
     }
 }
 
 
 
+// Gets the information from a tile as a object
 Minefield.prototype.getTile = function( _x, _y ) {
     
     
     if ((_x < 0 || _x >= this.columns)
     || (_y < 0 || _y >= this.rows)) {
         //Debug: console.warn( _x + ", " + _y + " went ouf of grid reach" )
-        return {value:0, tile:undefined};
+        return {};
     } else 
         return this.grid[ _y ][ _x ];
 }
@@ -316,7 +315,6 @@ Minefield.prototype.setTile = function( _x, _y, value ) {
         if (this.getTile( _x, _y ).value == -1)
             this.bombs--;
         /**
-         * -2 = flag
          * -1 = mine
          * 0 = empty field
          * 1 = mine indicator 1
@@ -361,10 +359,10 @@ Minefield.prototype.exposeTiles = function( tileValue, frame, protected, exposed
             
             var tile = this.getTile( x, y );
             
+            // Compare values with args (if args are given)
             if (((tileValue != undefined && tile.value == tileValue) || tileValue == undefined)
             && ((protected != undefined && tile.protected == protected) || protected == undefined)
             && ((exposed != undefined && tile.exposed == exposed) || exposed == undefined)) {
-            //if (((tileValue != undefined && tile.value == tileValue) || (tileValue == undefined)) && tile.protected == false && tile.exposed == false) {
                 
                 
                 if (frame)
