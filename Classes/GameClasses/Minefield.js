@@ -270,7 +270,7 @@ Minefield.prototype.spawnMines = function( amountOfMines, blacklistedTiles ) {
         while (foundEmptySpot == false) { // This should not endlessly loop due to the if statement above making sure there are enough tiles
             
             var randomNum = Math.floor( Math.random() * this.rows * this.columns );
-            var randomPos = {x: randomNum % this.columns, y: Math.floor(randomNum / this.rows)}; //Selects a random tile in the grid
+            var randomPos = {x: randomNum % this.columns, y: Math.floor(randomNum / this.columns)}; //Selects a random tile in the grid
             var blacklisted = false;
             
             if (blacklistedTiles != undefined)
